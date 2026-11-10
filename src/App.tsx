@@ -10,6 +10,7 @@ import {
   setUserSavedOutfits,
   ensureIsolatedClosets,
   syncWithServerDatabase,
+  findAndConsolidateRenatasWardrobe,
 } from './services/authService';
 import { Header, NavTab } from './components/Header';
 import { WardrobeView } from './components/WardrobeView';
@@ -29,8 +30,11 @@ export default function App() {
   const [preselectedCategory, setPreselectedCategory] = useState<ClothingCategory | undefined>(undefined);
   const [anchorItem, setAnchorItem] = useState<ClothingItem | null>(null);
 
-  // Sync with server database on startup (guarantees migrated Renata & Miguel data on Vercel)
+  // Consolidate Renata's 18 clothes and sync with server database on startup
   useEffect(() => {
+    findAndConsolidateRenatasWardrobe();
+    ensureIsolatedClosets();
+
     syncWithServerDatabase().then(() => {
       const active = getActiveSessionUser();
       if (active) {
@@ -47,6 +51,7 @@ export default function App() {
 
   // User Wardrobe State (Strictly isolated per currentUser.id)
   const [wardrobe, setWardrobe] = useState<ClothingItem[]>(() => {
+    findAndConsolidateRenatasWardrobe();
     ensureIsolatedClosets();
     const active = getActiveSessionUser();
     if (!active) return [];
@@ -269,6 +274,7 @@ export default function App() {
       <DatabaseMigrationModal
         isOpen={isDbModalOpen}
         onClose={() => setIsDbModalOpen(false)}
+        currentWardrobe={wardrobe}
         onDataRestored={() => {
           const active = getActiveSessionUser();
           if (active) {
