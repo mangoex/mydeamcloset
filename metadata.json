@@ -1,0 +1,6 @@
+{
+  "name": "VestirIA - Armario Virtual & Estilista Inteligente",
+  "description": "Sube fotos de tu ropa y genera outfits personalizados para diferentes temporadas y climas con inteligencia artificial.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
