@@ -243,8 +243,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <div className="p-4 bg-stone-50 border-t border-stone-100 space-y-2">
             <div className="flex items-center justify-between text-[11px] text-stone-500 font-mono">
               <span className="flex items-center gap-1">
-                <Users className="w-3.5 h-3.5" />
-                <span>Cuentas guardadas en este dispositivo ({registeredUsers.length}):</span>
+                <Users className="w-3.5 h-3.5 text-stone-600" />
+                <span>Cuentas en la Base de Datos ({registeredUsers.length}):</span>
               </span>
             </div>
 

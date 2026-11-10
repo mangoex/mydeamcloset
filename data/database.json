@@ -1,0 +1,120 @@
+{
+  "version": 1,
+  "updatedAt": 1794150000000,
+  "users": [
+    {
+      "id": "user_renata_01",
+      "name": "Renata",
+      "email": "renikenini1@gmail.com",
+      "avatarColor": "bg-rose-500",
+      "favoriteStyle": "Casual Chic & Tendencias",
+      "createdAt": 1794109468000
+    },
+    {
+      "id": "user_miguel_02",
+      "name": "Miguel",
+      "email": "miguel@mydreamcloset.app",
+      "avatarColor": "bg-stone-800",
+      "favoriteStyle": "Streetwear & Minimalista Urbano",
+      "createdAt": 1794120000000
+    }
+  ],
+  "credentialsVault": {
+    "renikenini1@gmail.com": "h_102030_4",
+    "miguel@mydreamcloset.app": "h_102030_4"
+  },
+  "wardrobes": {
+    "user_renata_01": [
+      {
+        "id": "renata_item_01",
+        "name": "Top Negro con Detalle de Encaje",
+        "category": "top",
+        "subCategory": "Blusa / Camiseta",
+        "imageUrl": "/assets/images/starter_cashmere_sweater_1794109468854.jpg",
+        "colors": ["Negro"],
+        "colorHex": "#18181b",
+        "material": "Algodón & Encaje",
+        "warmth": 2,
+        "seasons": ["primavera", "verano", "otono"],
+        "weather": ["calor", "templado"],
+        "vibes": ["casual", "chic"],
+        "stylingAdvice": "Pieza versátil para combinar con jeans rectos celestes y calzado en tonos tierra.",
+        "isCustomUpload": true,
+        "createdAt": 1794109468854
+      },
+      {
+        "id": "renata_item_02",
+        "name": "Jeans Rectos Tiro Alto Celestes",
+        "category": "bottom",
+        "subCategory": "Jeans / Denim",
+        "imageUrl": "/assets/images/starter_denim_jeans_1794109469753.jpg",
+        "colors": ["Azul claro", "Celeste"],
+        "colorHex": "#93c5fd",
+        "material": "Denim 100% Algodón",
+        "warmth": 3,
+        "seasons": ["primavera", "verano", "otono", "invierno"],
+        "weather": ["templado", "calor", "frio_moderado"],
+        "vibes": ["casual", "atemporal"],
+        "stylingAdvice": "Corte clásico que estiliza las piernas. Luce genial con tops fajados.",
+        "isCustomUpload": true,
+        "createdAt": 1794109469753
+      },
+      {
+        "id": "renata_item_03",
+        "name": "Botines de Gamuza Camel con Plataforma",
+        "category": "footwear",
+        "subCategory": "Botas / Botines",
+        "imageUrl": "/assets/images/starter_leather_boots_1794109470032.jpg",
+        "colors": ["Camel", "Marrón"],
+        "colorHex": "#b45309",
+        "material": "Gamuza & Forro Cálido",
+        "warmth": 4,
+        "seasons": ["otono", "invierno"],
+        "weather": ["frio_moderado", "frio_extremo", "templado"],
+        "vibes": ["casual", "comfy", "tendencia"],
+        "stylingAdvice": "Ancla los looks de clima fresco con máxima comodidad y estilo.",
+        "isCustomUpload": true,
+        "createdAt": 1794109470032
+      },
+      {
+        "id": "renata_item_04",
+        "name": "Abrigo Estructurado de Paño y Lana",
+        "category": "outerwear",
+        "subCategory": "Abrigo Largo",
+        "imageUrl": "/assets/images/starter_wool_coat_1794109469201.jpg",
+        "colors": ["Camel", "Tierra"],
+        "colorHex": "#78716c",
+        "material": "Lana & Paño",
+        "warmth": 5,
+        "seasons": ["otono", "invierno"],
+        "weather": ["frio_extremo", "frio_moderado", "viento"],
+        "vibes": ["elegante", "chic"],
+        "stylingAdvice": "Capa exterior de distinción absoluta para combinar con neutros.",
+        "isCustomUpload": true,
+        "createdAt": 1794109469201
+      }
+    ],
+    "user_miguel_02": []
+  },
+  "outfits": {
+    "user_renata_01": [
+      {
+        "id": "renata_outfit_01",
+        "title": "Casual Chic con Encaje y Denim",
+        "itemIds": ["renata_item_01", "renata_item_02", "renata_item_03"],
+        "season": "primavera",
+        "weather": "templado",
+        "occasion": "casual",
+        "harmonyScore": 96,
+        "temperatureSuitability": "Ideal para condiciones agradables y templadas (18°C a 22°C).",
+        "styleExplanation": "Contraste equilibrado entre la textura negra del encaje superior y la frescura del denim claro, anclado con la calidez del tono camel en el calzado.",
+        "stylingTips": [
+          "Mantén el cabello recogido o semi-recogido para destacar los detalles de los hombros.",
+          "Combina con accesorios dorados sutiles para realzar el tono camel."
+        ],
+        "savedAt": 1794109500000
+      }
+    ],
+    "user_miguel_02": []
+  }
+}

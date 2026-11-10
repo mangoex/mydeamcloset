@@ -9,6 +9,7 @@ import {
   getUserSavedOutfits,
   setUserSavedOutfits,
   ensureIsolatedClosets,
+  syncWithServerDatabase,
 } from './services/authService';
 import { Header, NavTab } from './components/Header';
 import { WardrobeView } from './components/WardrobeView';
@@ -26,9 +27,16 @@ export default function App() {
   const [preselectedCategory, setPreselectedCategory] = useState<ClothingCategory | undefined>(undefined);
   const [anchorItem, setAnchorItem] = useState<ClothingItem | null>(null);
 
-  // Run isolation check once on startup to guarantee Renata's closet is hers and Miguel's is clean
+  // Sync with server database on startup (guarantees migrated Renata & Miguel data on Vercel)
   useEffect(() => {
-    ensureIsolatedClosets();
+    syncWithServerDatabase().then(() => {
+      const active = getActiveSessionUser();
+      if (active) {
+        setCurrentUser(active);
+        setWardrobe(getUserWardrobe(active.id));
+        setSavedOutfits(getUserSavedOutfits(active.id));
+      }
+    });
   }, []);
 
   // Authentication State

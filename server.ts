@@ -24,6 +24,127 @@ app.use((_req, res, next) => {
 app.use(express.json({ limit: '35mb' }));
 app.use(express.urlencoded({ extended: true, limit: '35mb' }));
 
+import {
+  loadDatabase,
+  persistDatabase,
+  getDbUsers,
+  registerDbUser,
+  authenticateDbUser,
+  getDbUserWardrobe,
+  setDbUserWardrobe,
+  getDbUserOutfits,
+  setDbUserOutfits,
+} from './serverDatabase';
+
+// --- DATABASE & MULTI-TENANT PERSISTENCE API (Vercel & Local) ---
+
+// 1. Bootstrap: deliver seeded database with Renata and Miguel
+app.get('/api/database/bootstrap', (_req, res) => {
+  const db = loadDatabase();
+  return res.json({
+    version: db.version,
+    updatedAt: db.updatedAt,
+    users: db.users,
+    wardrobes: db.wardrobes,
+    outfits: db.outfits,
+  });
+});
+
+// 2. Users list
+app.get('/api/users', (_req, res) => {
+  const users = getDbUsers();
+  return res.json(users);
+});
+
+// 3. User Register
+app.post('/api/users/register', (req, res) => {
+  const { name, email, passwordHash, favoriteStyle } = req.body;
+  if (!name || !email || !passwordHash) {
+    return res.status(400).json({ error: 'Faltan campos obligatorios' });
+  }
+  const result = registerDbUser(name, email, passwordHash, favoriteStyle);
+  if (result.error) {
+    return res.status(400).json({ error: result.error });
+  }
+  return res.json(result);
+});
+
+// 4. User Login
+app.post('/api/users/login', (req, res) => {
+  const { email, passwordHash } = req.body;
+  if (!email || !passwordHash) {
+    return res.status(400).json({ error: 'Faltan credenciales' });
+  }
+  const result = authenticateDbUser(email, passwordHash);
+  if (result.error) {
+    return res.status(401).json({ error: result.error });
+  }
+  return res.json(result);
+});
+
+// 5. User Wardrobe GET & POST
+app.get('/api/wardrobe/:userId', (req, res) => {
+  const items = getDbUserWardrobe(req.params.userId);
+  return res.json(items);
+});
+
+app.post('/api/wardrobe/:userId', (req, res) => {
+  const items = req.body.items || [];
+  const updated = setDbUserWardrobe(req.params.userId, items);
+  return res.json({ success: true, count: updated.length, items: updated });
+});
+
+// 6. User Outfits GET & POST
+app.get('/api/outfits/:userId', (req, res) => {
+  const outfits = getDbUserOutfits(req.params.userId);
+  return res.json(outfits);
+});
+
+app.post('/api/outfits/:userId', (req, res) => {
+  const outfits = req.body.outfits || [];
+  const updated = setDbUserOutfits(req.params.userId, outfits);
+  return res.json({ success: true, count: updated.length, outfits: updated });
+});
+
+// 7. Full Database Export / Backup
+app.get('/api/database/export', (_req, res) => {
+  const db = loadDatabase();
+  return res.json(db);
+});
+
+// 8. Full Database Sync
+app.post('/api/database/sync', (req, res) => {
+  const clientData = req.body;
+  const db = loadDatabase();
+
+  if (Array.isArray(clientData.users)) {
+    for (const u of clientData.users) {
+      if (!db.users.some((x) => x.id === u.id || x.email === u.email)) {
+        db.users.push(u);
+      }
+    }
+  }
+
+  if (clientData.wardrobes && typeof clientData.wardrobes === 'object') {
+    for (const [uid, items] of Object.entries(clientData.wardrobes)) {
+      if (Array.isArray(items) && items.length > 0) {
+        db.wardrobes[uid] = items as any[];
+      }
+    }
+  }
+
+  if (clientData.outfits && typeof clientData.outfits === 'object') {
+    for (const [uid, outfits] of Object.entries(clientData.outfits)) {
+      if (Array.isArray(outfits) && outfits.length > 0) {
+        db.outfits[uid] = outfits as any[];
+      }
+    }
+  }
+
+  persistDatabase(db);
+  return res.json({ success: true, updatedAt: db.updatedAt });
+});
+
 // Initialize Google GenAI client if key exists
 const apiKey = process.env.GEMINI_API_KEY || '';
 const ai = apiKey

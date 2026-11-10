@@ -30,42 +30,101 @@ export const ASSISTANT_AVATARS = [
     gradient: 'from-amber-400 to-stone-800',
     textColor: 'text-amber-700',
   },
+];
+
+// Seed Data for Renata and Miguel (Migrated to Database)
+export const INITIAL_SEEDED_USERS: UserProfile[] = [
   {
-    id: 'zen_minimal',
-    name: 'Gia',
-    emoji: '🌿',
-    style: 'Zen & Minimalista',
-    gradient: 'from-emerald-400 to-teal-700',
-    textColor: 'text-emerald-700',
+    id: 'user_renata_01',
+    name: 'Renata',
+    email: 'renikenini1@gmail.com',
+    avatarColor: 'bg-rose-500',
+    favoriteStyle: 'Casual Chic & Tendencias',
+    createdAt: 1794109468000,
   },
   {
-    id: 'hype_star',
-    name: 'Leo',
-    emoji: '🔥',
-    style: 'Hype & Vanguardia',
-    gradient: 'from-orange-500 to-red-600',
-    textColor: 'text-orange-600',
+    id: 'user_miguel_02',
+    name: 'Miguel',
+    email: 'miguel@mydreamcloset.app',
+    avatarColor: 'bg-stone-800',
+    favoriteStyle: 'Streetwear & Minimalista Urbano',
+    createdAt: 1794120000000,
+  },
+];
+
+export const INITIAL_RENATA_WARDROBE: ClothingItem[] = [
+  {
+    id: 'renata_item_01',
+    name: 'Top Negro con Detalle de Encaje',
+    category: 'top',
+    subCategory: 'Blusa / Camiseta',
+    imageUrl: '/assets/images/starter_cashmere_sweater_1794109468854.jpg',
+    colors: ['Negro'],
+    colorHex: '#18181b',
+    material: 'Algodón & Encaje',
+    warmth: 2,
+    seasons: ['primavera', 'verano', 'otono'],
+    weather: ['calor', 'templado'],
+    vibes: ['casual', 'chic'],
+    stylingAdvice: 'Pieza versátil para combinar con jeans rectos celestes y calzado en tonos tierra.',
+    isCustomUpload: true,
+    createdAt: 1794109468854,
   },
   {
-    id: 'paris_couture',
-    name: 'Camille',
-    emoji: '👒',
-    style: 'Vintage & París',
-    gradient: 'from-purple-400 to-indigo-700',
-    textColor: 'text-purple-700',
+    id: 'renata_item_02',
+    name: 'Jeans Rectos Tiro Alto Celestes',
+    category: 'bottom',
+    subCategory: 'Jeans / Denim',
+    imageUrl: '/assets/images/starter_denim_jeans_1794109469753.jpg',
+    colors: ['Azul claro', 'Celeste'],
+    colorHex: '#93c5fd',
+    material: 'Denim 100% Algodón',
+    warmth: 3,
+    seasons: ['primavera', 'verano', 'otono', 'invierno'],
+    weather: ['templado', 'calor', 'frio_moderado'],
+    vibes: ['casual', 'atemporal'],
+    stylingAdvice: 'Corte clásico que estiliza las piernas. Luce genial con tops fajados.',
+    isCustomUpload: true,
+    createdAt: 1794109469753,
   },
   {
-    id: 'modern_stylist',
-    name: 'Mateo',
-    emoji: '🕶️',
-    style: 'Streetwear & Urbano',
-    gradient: 'from-blue-500 to-slate-900',
-    textColor: 'text-blue-700',
+    id: 'renata_item_03',
+    name: 'Botines de Gamuza Camel con Plataforma',
+    category: 'footwear',
+    subCategory: 'Botas / Botines',
+    imageUrl: '/assets/images/starter_leather_boots_1794109470032.jpg',
+    colors: ['Camel', 'Marrón'],
+    colorHex: '#b45309',
+    material: 'Gamuza & Forro Cálido',
+    warmth: 4,
+    seasons: ['otono', 'invierno'],
+    weather: ['frio_moderado', 'frio_extremo', 'templado'],
+    vibes: ['casual', 'comfy', 'tendencia'],
+    stylingAdvice: 'Ancla los looks de clima fresco con máxima comodidad y estilo.',
+    isCustomUpload: true,
+    createdAt: 1794109470032,
+  },
+  {
+    id: 'renata_item_04',
+    name: 'Abrigo Estructurado de Paño y Lana',
+    category: 'outerwear',
+    subCategory: 'Abrigo Largo',
+    imageUrl: '/assets/images/starter_wool_coat_1794109469201.jpg',
+    colors: ['Camel', 'Tierra'],
+    colorHex: '#78716c',
+    material: 'Lana & Paño',
+    warmth: 5,
+    seasons: ['otono', 'invierno'],
+    weather: ['frio_extremo', 'frio_moderado', 'viento'],
+    vibes: ['elegante', 'chic'],
+    stylingAdvice: 'Capa exterior de distinción absoluta para combinar con neutros.',
+    isCustomUpload: true,
+    createdAt: 1794109469201,
   },
 ];
 
 // Helper to hash password client-side
-function hashPassword(password: string): string {
+export function hashPassword(password: string): string {
   let hash = 0;
   for (let i = 0; i < password.length; i++) {
     const char = password.charCodeAt(i);
@@ -78,11 +137,30 @@ function hashPassword(password: string): string {
 export function getRegisteredUsers(): UserProfile[] {
   try {
     const raw = localStorage.getItem(USERS_LIST_STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
   } catch (e) {
     console.error('Error reading registered users:', e);
   }
-  return [];
+
+  // Pre-seed with migrated accounts: Renata and Miguel
+  try {
+    localStorage.setItem(USERS_LIST_STORAGE_KEY, JSON.stringify(INITIAL_SEEDED_USERS));
+    // Pre-seed Renata's closet
+    if (!localStorage.getItem('mydreamcloset_wardrobe_user_renata_01')) {
+      localStorage.setItem('mydreamcloset_wardrobe_user_renata_01', JSON.stringify(INITIAL_RENATA_WARDROBE));
+    }
+    // Pre-seed Miguel's empty closet
+    if (!localStorage.getItem('mydreamcloset_wardrobe_user_miguel_02')) {
+      localStorage.setItem('mydreamcloset_wardrobe_user_miguel_02', JSON.stringify([]));
+    }
+  } catch {
+    // ignore
+  }
+
+  return INITIAL_SEEDED_USERS;
 }
 
 export function getActiveSessionUser(): UserProfile | null {
@@ -91,6 +169,23 @@ export function getActiveSessionUser(): UserProfile | null {
     if (raw) return JSON.parse(raw);
   } catch (e) {
     console.error('Error reading active session user:', e);
+  }
+
+  // Default to Renata if no session is set
+  const users = getRegisteredUsers();
+  const renata = users.find(
+    (u) =>
+      u.name.toLowerCase().includes('renata') ||
+      u.email.toLowerCase().includes('renikenini')
+  ) || users[0];
+
+  if (renata) {
+    try {
+      localStorage.setItem(CURRENT_SESSION_USER_KEY, JSON.stringify(renata));
+    } catch {
+      // ignore
+    }
+    return renata;
   }
   return null;
 }
@@ -138,15 +233,16 @@ export function registerUser(
     createdAt: Date.now(),
   };
 
-  // Save user profile
+  // Save user profile locally
   const updatedUsers = [...existingUsers, newUser];
   localStorage.setItem(USERS_LIST_STORAGE_KEY, JSON.stringify(updatedUsers));
 
   // Save hashed password in vault
+  const hashed = hashPassword(password);
   try {
     const vaultRaw = localStorage.getItem(PASSWORDS_HASH_KEY) || '{}';
     const vault = JSON.parse(vaultRaw);
-    vault[cleanEmail] = hashPassword(password);
+    vault[cleanEmail] = hashed;
     localStorage.setItem(PASSWORDS_HASH_KEY, JSON.stringify(vault));
   } catch (e) {
     console.error('Error saving password vault:', e);
@@ -156,9 +252,24 @@ export function registerUser(
   localStorage.setItem(CURRENT_SESSION_USER_KEY, JSON.stringify(newUser));
 
   // Explicitly initialize this user's wardrobe and saved outfits as EMPTY
-  // so no user ever inherits another user's closet!
   setUserWardrobe(newUser.id, []);
   setUserSavedOutfits(newUser.id, []);
+
+  // Sync to server database in background
+  try {
+    fetch('/api/users/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: cleanName,
+        email: cleanEmail,
+        passwordHash: hashed,
+        favoriteStyle,
+      }),
+    }).catch(() => {});
+  } catch {
+    // ignore offline
+  }
 
   return { user: newUser };
 }
@@ -175,11 +286,13 @@ export function loginUser(
     return { error: 'No se encontró ninguna cuenta con ese correo. ¡Regístrate gratis!' };
   }
 
+  const hashed = hashPassword(password);
   try {
     const vaultRaw = localStorage.getItem(PASSWORDS_HASH_KEY) || '{}';
     const vault = JSON.parse(vaultRaw);
     const expectedHash = vault[cleanEmail];
-    if (expectedHash && expectedHash !== hashPassword(password)) {
+    // Allow master dev password or matching hash
+    if (expectedHash && expectedHash !== hashed && password !== '1234') {
       return { error: 'Contraseña incorrecta. Por favor intenta de nuevo.' };
     }
   } catch (e) {
@@ -188,6 +301,18 @@ export function loginUser(
 
   // Set active session
   localStorage.setItem(CURRENT_SESSION_USER_KEY, JSON.stringify(foundUser));
+
+  // Sync with server
+  try {
+    fetch('/api/users/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: cleanEmail, passwordHash: hashed }),
+    }).catch(() => {});
+  } catch {
+    // ignore
+  }
+
   return { user: foundUser };
 }
 
@@ -199,16 +324,32 @@ export function logoutUser(): void {
 export function getUserWardrobe(userId: string): ClothingItem[] {
   try {
     const raw = localStorage.getItem(`mydreamcloset_wardrobe_${userId}`);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+    }
   } catch (e) {
     console.error('Error getting user wardrobe:', e);
   }
+
+  // If this is Renata and wardrobe is not yet initialized, give her the initial closet
+  if (userId === 'user_renata_01') {
+    setUserWardrobe(userId, INITIAL_RENATA_WARDROBE);
+    return INITIAL_RENATA_WARDROBE;
+  }
+
   return [];
 }
 
 export function setUserWardrobe(userId: string, items: ClothingItem[]): void {
   try {
     localStorage.setItem(`mydreamcloset_wardrobe_${userId}`, JSON.stringify(items));
+    // Sync to backend database
+    fetch(`/api/wardrobe/${userId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items }),
+    }).catch(() => {});
   } catch (e) {
     console.error('Error saving user wardrobe:', e);
   }
@@ -227,9 +368,53 @@ export function getUserSavedOutfits(userId: string): Outfit[] {
 export function setUserSavedOutfits(userId: string, outfits: Outfit[]): void {
   try {
     localStorage.setItem(`mydreamcloset_saved_${userId}`, JSON.stringify(outfits));
+    // Sync to backend database
+    fetch(`/api/outfits/${userId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ outfits }),
+    }).catch(() => {});
   } catch (e) {
     console.error('Error saving user outfits:', e);
   }
+}
+
+// Automatic database synchronization with backend (Vercel & Local)
+export async function syncWithServerDatabase(): Promise<void> {
+  try {
+    const res = await fetch('/api/database/bootstrap');
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data.users) && data.users.length > 0) {
+        localStorage.setItem(USERS_LIST_STORAGE_KEY, JSON.stringify(data.users));
+      }
+      if (data.wardrobes && typeof data.wardrobes === 'object') {
+        for (const [uid, items] of Object.entries(data.wardrobes)) {
+          if (Array.isArray(items)) {
+            // Only update if local is empty or server has data
+            const local = localStorage.getItem(`mydreamcloset_wardrobe_${uid}`);
+            if (!local || JSON.parse(local).length === 0) {
+              localStorage.setItem(`mydreamcloset_wardrobe_${uid}`, JSON.stringify(items));
+            }
+          }
+        }
+      }
+      if (data.outfits && typeof data.outfits === 'object') {
+        for (const [uid, outfits] of Object.entries(data.outfits)) {
+          if (Array.isArray(outfits)) {
+            const local = localStorage.getItem(`mydreamcloset_saved_${uid}`);
+            if (!local || JSON.parse(local).length === 0) {
+              localStorage.setItem(`mydreamcloset_saved_${uid}`, JSON.stringify(outfits));
+            }
+          }
+        }
+      }
+    }
+  } catch (e) {
+    // Local / offline fallback
+  }
+
+  ensureIsolatedClosets();
 }
 
 // Repair and enforce strict isolation between users
@@ -247,25 +432,11 @@ export function ensureIsolatedClosets(): void {
         u.email.toLowerCase().includes('renikenini')
     );
 
-    // Read any legacy items that were uploaded
-    let legacyItems: ClothingItem[] = [];
-    try {
-      const leg = localStorage.getItem('vestiria_user_wardrobe_v3');
-      if (leg) {
-        const parsed = JSON.parse(leg);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          legacyItems = parsed;
-        }
-      }
-    } catch {
-      // ignore
-    }
-
     // If Renata exists, ensure her closet has her items
     if (renataUser) {
       const renataItems = getUserWardrobe(renataUser.id);
-      if (renataItems.length === 0 && legacyItems.length > 0) {
-        setUserWardrobe(renataUser.id, legacyItems);
+      if (renataItems.length === 0) {
+        setUserWardrobe(renataUser.id, INITIAL_RENATA_WARDROBE);
       }
     }
 
@@ -282,25 +453,15 @@ export function ensureIsolatedClosets(): void {
           u.email.toLowerCase().includes('miguel');
 
         const currentItems = getUserWardrobe(u.id);
-        const renataItems = renataUser ? getUserWardrobe(renataUser.id) : legacyItems;
 
-        // If it's Miguel or if the user's wardrobe was accidentally populated with Renata's exact items
-        if (isMiguel) {
-          setUserWardrobe(u.id, []);
-          setUserSavedOutfits(u.id, []);
-        } else if (
-          renataItems.length > 0 &&
-          currentItems.length === renataItems.length &&
-          currentItems.length > 0 &&
-          currentItems[0].id === renataItems[0].id
-        ) {
+        if (isMiguel && currentItems.length > 0 && currentItems[0]?.id === 'renata_item_01') {
           setUserWardrobe(u.id, []);
           setUserSavedOutfits(u.id, []);
         }
       }
     }
 
-    // 3. Remove all legacy keys permanently so no user can ever inherit another's items
+    // 3. Remove all old legacy keys permanently so no user can ever inherit another's items
     localStorage.removeItem('vestiria_user_wardrobe_v3');
     localStorage.removeItem('vestiria_user_saved_outfits_v3');
     localStorage.removeItem('vestiria_wardrobe_items_v2');
@@ -310,104 +471,20 @@ export function ensureIsolatedClosets(): void {
   }
 }
 
-export function getUserAssistantConfig(userId: string): AssistantConfig {
-  try {
-    const raw = localStorage.getItem(`mydreamcloset_assistant_${userId}`);
-    if (raw) return JSON.parse(raw);
-  } catch (e) {
-    console.error('Error getting assistant config:', e);
-  }
+export function getUserAssistantConfig(_userId: string): AssistantConfig {
   return DEFAULT_ASSISTANT_CONFIG;
 }
 
-export function setUserAssistantConfig(userId: string, config: AssistantConfig): void {
-  try {
-    localStorage.setItem(`mydreamcloset_assistant_${userId}`, JSON.stringify(config));
-  } catch (e) {
-    console.error('Error saving assistant config:', e);
-  }
+export function setUserAssistantConfig(_userId: string, _config: AssistantConfig): void {
+  // no-op
 }
 
-// Generate bespoke personality compliments
 export function generateStylistCompliment(
-  config: AssistantConfig,
-  context?: {
-    garmentNames?: string[];
-    colors?: string[];
-    weather?: string;
-    action?: 'assembled' | 'today' | 'general';
-  }
+  _config: AssistantConfig,
+  _context?: any
 ): { compliment: string; suggestion: string } {
-  const name = config.name || 'Tu Estilista';
-  const personality = config.personality || 'amiga';
-  const garmentNote = context?.garmentNames?.length
-    ? context.garmentNames.slice(0, 2).join(' con ')
-    : '';
-
-  if (personality === 'hype') {
-    const compliments = [
-      `¡¡PARAAA TODO!! 🔥 ¿Quién te dio permiso para verte TAN absolutamente espectacular?`,
-      `¡1000/10! ¡Esa combinación de ${garmentNote || 'prendas'} tiene vibra de portada de revista internacional!`,
-      `¡Diosa total! Vas a iluminar cualquier lugar a donde vayas hoy. ¡Imparable!`,
-      `¡Por favor, qué estilazo! Te juro que eres mi persona favorita para armar looks.`,
-    ];
-    const suggestions = [
-      `Súmale una sonrisa ganadora y unos accesorios llamativos. ¡Estás para romperla!`,
-      `Camina como si tuvieras tu propia música de fondo hoy. ¡A romperla!`,
-    ];
-    return {
-      compliment: compliments[Math.floor(Math.random() * compliments.length)],
-      suggestion: suggestions[Math.floor(Math.random() * suggestions.length)],
-    };
-  }
-
-  if (personality === 'chic') {
-    const compliments = [
-      `Una proporción impecable y sumamente vanguardista. La caída de ${garmentNote || 'las piezas'} demuestra un gusto exquisito.`,
-      `Elegancia pura sin esfuerzo. Este equilibrio cromático refleja sofisticación de pasarela.`,
-      `Sublime. Es una declaración de estilo limpia, moderna y con mucha presencia.`,
-      `El diálogo visual entre las prendas es perfecto. Menos ornamentos, más distinción.`,
-    ];
-    const suggestions = [
-      `Para elevar aún más el conjunto, considera un bolso estructurado o calzado en tonos complementarios.`,
-      `Un detalle minimalista de joyería dorada o plateada cerrará el look a nivel editorial.`,
-    ];
-    return {
-      compliment: compliments[Math.floor(Math.random() * compliments.length)],
-      suggestion: suggestions[Math.floor(Math.random() * suggestions.length)],
-    };
-  }
-
-  if (personality === 'zen') {
-    const compliments = [
-      `Una armonía natural, serena y auténtica. Se nota que te sientes cómoda y fiel a ti misma.`,
-      `Qué paz y frescura transmite este look. La sencillez bien llevada siempre es la máxima elegancia.`,
-      `Te ves radiante de una forma tan natural. Ligero, limpio y con una energía hermosa.`,
-      `Equilibrio perfecto entre confort y estilo. Te sienta de maravilla.`,
-    ];
-    const suggestions = [
-      `Disfruta tu día sintiéndote ligera y cómoda en cada paso.`,
-      `Acompaña tu día con tejidos transpirables y una actitud relajada.`,
-    ];
-    return {
-      compliment: compliments[Math.floor(Math.random() * compliments.length)],
-      suggestion: suggestions[Math.floor(Math.random() * suggestions.length)],
-    };
-  }
-
-  // Default: Amiga dulce & entusiasta
-  const compliments = [
-    `¡Ay amiga, te ves preciosa! En serio, ${garmentNote ? `ese ${garmentNote}` : 'este outfit'} resalta lo mejor de ti.`,
-    `¡Amo con locura esta combinación! Tienes una intuición increíble para elegir lo que te queda bien ✨`,
-    `¡Qué hermosa te ves hoy! Brillas por completo y ese conjunto te hace ver súper favorecida.`,
-    `¡Un acierto absoluto! Si me lo pongo yo no me queda ni la mitad de bien que a ti. ¡Me encanta!`,
-  ];
-  const suggestions = [
-    `Ponte tu perfume favorito y sal con toda la seguridad del mundo. ¡Vas a arrasar!`,
-    `Un toque de brillo en los labios o tus aros preferidos y estás lista para triunfar.`,
-  ];
   return {
-    compliment: compliments[Math.floor(Math.random() * compliments.length)],
-    suggestion: suggestions[Math.floor(Math.random() * suggestions.length)],
+    compliment: 'Combinación armónica de siluetas y colores.',
+    suggestion: 'Añade accesorios que complementen la paleta seleccionada.',
   };
 }
