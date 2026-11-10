@@ -145,6 +145,43 @@ app.post('/api/database/sync', (req, res) => {
   return res.json({ success: true, updatedAt: db.updatedAt });
 });
 
+// 9. Direct download endpoint that prompts file download
+app.get('/api/database/download', (_req, res) => {
+  const db = loadDatabase();
+  const dateStr = new Date().toISOString().slice(0, 10);
+  res.setHeader('Content-Disposition', `attachment; filename="mydreamcloset_database_${dateStr}.json"`);
+  res.setHeader('Content-Type', 'application/json');
+  return res.send(JSON.stringify(db, null, 2));
+});
+
+// 10. Direct import / restore endpoint
+app.post('/api/database/restore', (req, res) => {
+  const importedData = req.body;
+  if (!importedData || !Array.isArray(importedData.users)) {
+    return res.status(400).json({ error: 'Formato de base de datos no válido' });
+  }
+  const db = loadDatabase();
+  db.version = importedData.version || 1;
+  db.updatedAt = Date.now();
+  db.users = importedData.users;
+  if (importedData.credentialsVault) {
+    db.credentialsVault = { ...db.credentialsVault, ...importedData.credentialsVault };
+  }
+  if (importedData.wardrobes) {
+    db.wardrobes = importedData.wardrobes;
+  }
+  if (importedData.outfits) {
+    db.outfits = importedData.outfits;
+  }
+  persistDatabase(db);
+  return res.json({
+    success: true,
+    userCount: db.users.length,
+    wardrobesCount: Object.keys(db.wardrobes || {}).length,
+    updatedAt: db.updatedAt,
+  });
+});
+
 // Initialize Google GenAI client if key exists
 const apiKey = process.env.GEMINI_API_KEY || '';
 const ai = apiKey

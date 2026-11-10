@@ -19,11 +19,13 @@ import { DailyWeatherStylist } from './components/DailyWeatherStylist';
 import { SavedOutfitsView } from './components/SavedOutfitsView';
 import { UploadModal } from './components/UploadModal';
 import { AuthModal } from './components/AuthModal';
+import { DatabaseMigrationModal } from './components/DatabaseMigrationModal';
 import { ShieldCheck, User } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<NavTab>('wardrobe');
   const [isUploadModalOpen, setIsUploadModalOpen] = useState<boolean>(false);
+  const [isDbModalOpen, setIsDbModalOpen] = useState<boolean>(false);
   const [preselectedCategory, setPreselectedCategory] = useState<ClothingCategory | undefined>(undefined);
   const [anchorItem, setAnchorItem] = useState<ClothingItem | null>(null);
 
@@ -166,6 +168,7 @@ export default function App() {
         user={currentUser}
         onOpenAuth={() => setIsAuthModalOpen(true)}
         onLogout={handleLogout}
+        onOpenDatabaseModal={() => setIsDbModalOpen(true)}
       />
 
       {/* Unauthenticated Notification Banner if guest is browsing */}
@@ -260,6 +263,20 @@ export default function App() {
         }}
         onAuthSuccess={handleAuthSuccess}
         canClose={!!currentUser}
+      />
+
+      {/* Database Backup & Vercel Migration Modal */}
+      <DatabaseMigrationModal
+        isOpen={isDbModalOpen}
+        onClose={() => setIsDbModalOpen(false)}
+        onDataRestored={() => {
+          const active = getActiveSessionUser();
+          if (active) {
+            setCurrentUser(active);
+            setWardrobe(getUserWardrobe(active.id));
+            setSavedOutfits(getUserSavedOutfits(active.id));
+          }
+        }}
       />
 
       {/* Footer */}

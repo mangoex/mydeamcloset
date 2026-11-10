@@ -11,6 +11,8 @@ import {
   User,
   LogOut,
   ChevronDown,
+  Database,
+  Download,
 } from 'lucide-react';
 import { UserProfile } from '../types/auth';
 
@@ -25,6 +27,7 @@ interface HeaderProps {
   user: UserProfile | null;
   onOpenAuth: () => void;
   onLogout: () => void;
+  onOpenDatabaseModal: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -36,6 +39,7 @@ export const Header: React.FC<HeaderProps> = ({
   user,
   onOpenAuth,
   onLogout,
+  onOpenDatabaseModal,
 }) => {
   const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
 
@@ -130,8 +134,18 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         </nav>
 
-        {/* Zone 3: Add Garment & User Profile */}
+        {/* Zone 3: Database & Cloud Sync, Add Garment & User Profile */}
         <div className="flex items-center gap-2.5 shrink-0">
+          {/* Database Download / Migrate Button */}
+          <button
+            onClick={onOpenDatabaseModal}
+            className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg border border-stone-200 hover:border-stone-400 bg-white text-stone-700 hover:text-stone-900 transition-colors cursor-pointer shadow-2xs whitespace-nowrap active:scale-98"
+            title="Descargar o migrar base de datos a Vercel"
+          >
+            <Database className="w-3.5 h-3.5 text-amber-600" />
+            <span className="hidden sm:inline">Base de Datos</span>
+          </button>
+
           <button
             onClick={onOpenUpload}
             className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-stone-900 rounded-lg hover:bg-stone-800 transition-colors cursor-pointer shadow-sm whitespace-nowrap shrink-0 active:scale-98"
@@ -169,7 +183,7 @@ export const Header: React.FC<HeaderProps> = ({
               {showUserMenu && (
                 <div
                   onMouseLeave={() => setShowUserMenu(false)}
-                  className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-stone-200 p-2 z-50 animate-in fade-in zoom-in-95 duration-150 space-y-1"
+                  className="absolute right-0 mt-2 w-60 bg-white rounded-2xl shadow-xl border border-stone-200 p-2 z-50 animate-in fade-in zoom-in-95 duration-150 space-y-1"
                 >
                   <div className="px-3 py-2 border-b border-stone-100">
                     <p className="text-xs font-bold text-stone-900 truncate">Closet de {user.name}</p>
@@ -178,6 +192,17 @@ export const Header: React.FC<HeaderProps> = ({
                       {wardrobeCount} prendas privadas
                     </span>
                   </div>
+
+                  <button
+                    onClick={() => {
+                      setShowUserMenu(false);
+                      onOpenDatabaseModal();
+                    }}
+                    className="w-full text-left px-3 py-2 rounded-xl text-xs text-stone-700 hover:bg-stone-50 flex items-center gap-2 cursor-pointer font-medium"
+                  >
+                    <Database className="w-4 h-4 text-amber-600" />
+                    <span>Base de Datos & Vercel</span>
+                  </button>
 
                   <button
                     onClick={() => {

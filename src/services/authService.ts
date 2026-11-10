@@ -488,3 +488,132 @@ export function generateStylistCompliment(
     suggestion: 'Añade accesorios que complementen la paleta seleccionada.',
   };
 }
+
+// Export entire database as downloadable JSON file
+export function exportDatabaseAsJsonFile(): void {
+  const users = getRegisteredUsers();
+  const credentialsVault = (() => {
+    try {
+      return JSON.parse(localStorage.getItem(PASSWORDS_HASH_KEY) || '{}');
+    } catch {
+      return {};
+    }
+  })();
+
+  const wardrobes: Record<string, ClothingItem[]> = {};
+  const outfits: Record<string, Outfit[]> = {};
+
+  for (const u of users) {
+    wardrobes[u.id] = getUserWardrobe(u.id);
+    outfits[u.id] = getUserSavedOutfits(u.id);
+  }
+
+  const exportData = {
+    appName: 'My Dream Closet',
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    users,
+    credentialsVault,
+    wardrobes,
+    outfits,
+  };
+
+  const jsonString = JSON.stringify(exportData, null, 2);
+  const blob = new Blob([jsonString], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `mydreamcloset_database_backup_${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Import and restore database from JSON file
+export async function importDatabaseFromJsonFile(
+  file: File
+): Promise<{ success: boolean; userCount?: number; totalItems?: number; error?: string }> {
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+
+    if (!data || !Array.isArray(data.users)) {
+      return { success: false, error: 'El archivo no contiene un formato de base de datos válido.' };
+    }
+
+    // 1. Restore users
+    localStorage.setItem(USERS_LIST_STORAGE_KEY, JSON.stringify(data.users));
+
+    // 2. Restore credentials
+    if (data.credentialsVault && typeof data.credentialsVault === 'object') {
+      localStorage.setItem(PASSWORDS_HASH_KEY, JSON.stringify(data.credentialsVault));
+    }
+
+    // 3. Restore wardrobes
+    let totalItems = 0;
+    if (data.wardrobes && typeof data.wardrobes === 'object') {
+      for (const [uid, items] of Object.entries(data.wardrobes)) {
+        if (Array.isArray(items)) {
+          localStorage.setItem(`mydreamcloset_wardrobe_${uid}`, JSON.stringify(items));
+          totalItems += items.length;
+        }
+      }
+    }
+
+    // 4. Restore outfits
+    if (data.outfits && typeof data.outfits === 'object') {
+      for (const [uid, saved] of Object.entries(data.outfits)) {
+        if (Array.isArray(saved)) {
+          localStorage.setItem(`mydreamcloset_saved_${uid}`, JSON.stringify(saved));
+        }
+      }
+    }
+
+    // 5. Sync to server backend
+    try {
+      await fetch('/api/database/restore', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+    } catch {
+      // ignore
+    }
+
+    // 6. Set active user to Renata or first user
+    const users: UserProfile[] = data.users;
+    const renata = users.find(
+      (u) =>
+        u.name.toLowerCase().includes('renata') ||
+        u.email.toLowerCase().includes('renikenini')
+    ) || users[0];
+
+    if (renata) {
+      localStorage.setItem(CURRENT_SESSION_USER_KEY, JSON.stringify(renata));
+    }
+
+    return { success: true, userCount: users.length, totalItems };
+  } catch (err: any) {
+    console.error('Error importing database:', err);
+    return { success: false, error: err.message || 'Error al procesar el archivo JSON.' };
+  }
+}
+
+export function getDatabaseSummaryStats() {
+  const users = getRegisteredUsers();
+  let totalItems = 0;
+  let totalOutfits = 0;
+
+  for (const u of users) {
+    totalItems += getUserWardrobe(u.id).length;
+    totalOutfits += getUserSavedOutfits(u.id).length;
+  }
+
+  return {
+    userCount: users.length,
+    totalItems,
+    totalOutfits,
+    users,
+  };
+}
